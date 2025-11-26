@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered invoice data extraction using Cerebras and OCR">
+    <title>InvoiceAI - AI-Powered Invoice Reader</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-container">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+                <h1 class="title">InvoiceAI</h1>
+            </div>
+            <p class="subtitle">Upload an invoice and let AI read it for you</p>
+        </header>
+
+        <!-- Main Card -->
+        <main class="main-card">
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <div class="upload-zone" id="uploadZone">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M17 8L12 3L7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    <h2 class="upload-title">Drop your invoice here</h2>
+                    <p class="upload-text">or click to browse</p>
+                    <p class="upload-formats">Supports PDF, JPG, PNG (max 10MB)</p>
+                    <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" hidden>
+                </div>
+
+                <!-- File Preview -->
+                <div class="file-preview" id="filePreview" style="display: none;">
+                    <div class="file-info">
+                        <svg class="file-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                        <div class="file-details">
+                            <span class="file-name" id="fileName">invoice.pdf</span>
+                            <span class="file-size" id="fileSize">2.4 MB</span>
+                        </div>
+                    </div>
+                    <button class="remove-btn" id="removeBtn" type="button">×</button>
+                </div>
+
+                <!-- Extract Button -->
+                <button class="extract-btn" id="extractBtn" disabled>
+                    <span class="btn-text">Extract Invoice</span>
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </section>
+
+            <!-- Loading State -->
+            <div class="loading-state" id="loadingState" style="display: none;">
+                <div class="spinner"></div>
+                <p class="loading-text">Processing your invoice...</p>
+                <p class="loading-subtext">This may take a few moments</p>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage" style="display: none;">
+                <svg class="error-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                    <path d="M12 8V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    <circle cx="12" cy="16" r="1" fill="currentColor" />
+                </svg>
+                <p class="error-text" id="errorText">Something went wrong</p>
+            </div>
+
+            <!-- Results Section -->
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <!-- Invoice Summary -->
+                <div class="result-card">
+                    <h2 class="result-title">Invoice Summary</h2>
+                    <div class="invoice-summary" id="invoiceSummary">
+                        <!-- Dynamic content will be inserted here -->
+                    </div>
+                </div>
+
+                <!-- JSON Output -->
+                <div class="result-card">
+                    <div class="json-header">
+                        <h2 class="result-title">Structured JSON</h2>
+                        <button class="toggle-btn" id="toggleJsonBtn">Show</button>
+                    </div>
+                    <pre class="json-output" id="jsonOutput" style="display: none;"></pre>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Powered by <strong>Cerebras AI</strong> (Llama 3.1 70B) & <strong>EasyOCR</strong></p>
+        </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/static/app.js"></script>
+</body>
+
+</html>
